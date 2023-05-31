@@ -5,6 +5,7 @@ Shader "UI/RoundRect"
 		_MainTex ("Texture", 2D) = "white" {}
 		_Radius("Radius", Range(0,0.5)) = 0.1
 		_Color("Color", Color) = (1,1,1,1)
+		[Toggle(ColorAdditive)] _ColorAdditive("Color Additive",Int) = 1
 		[Toggle(All)]_All("All Round", Int) = 1
 		[Toggle(LeftTop)]_LeftTop("Left Top", Int) = 0
 		[Toggle(RightTop)]_RightTop("Right Top", Int) = 0
@@ -48,6 +49,7 @@ Shader "UI/RoundRect"
 			int _RightTop;
 			int _LeftBottom;
 			int _RightBottom;
+			int _ColorAdditive;
 			
 			v2f vert (appdata v)
 			{
@@ -60,7 +62,11 @@ Shader "UI/RoundRect"
 			}
 
 			fixed4 drawWithoutCorner(v2f i): SV_Target {
-				fixed4 col = tex2D(_MainTex,i.uv) * _Color;
+				fixed4 col = tex2D(_MainTex,i.uv);
+				if(_ColorAdditive == 1) 
+				{
+					col*=_Color;
+				}
 				UNITY_APPLY_FOG(i.fogCoord, col);
 				return col;
 			}
@@ -97,27 +103,28 @@ Shader "UI/RoundRect"
 					}
 				}
 				bool isDiscard = false;
+				bool shouldDiscard = length(abs(uv) - fixed2(r, r)) > _Radius;
 				if(_All == 1) 
 				{
-					isDiscard = length(abs(uv) - fixed2(r, r)) > _Radius;
+					isDiscard = shouldDiscard;
 				}
 				else 
 				{
 					if(_LeftTop == 1 && (uv.x < 0 && uv.y > 0))
 					{
-						isDiscard = length(abs(uv) - fixed2(r, r)) > _Radius;
+						isDiscard = shouldDiscard;
 					}
 					if(_LeftBottom == 1 && uv.x < 0 && uv.y < 0)
 					{
-						isDiscard = length(abs(uv) - fixed2(r, r)) > _Radius;
+						isDiscard = shouldDiscard;
 					}
 					if(_RightTop == 1 && uv.x > 0 && uv.y > 0)
 					{
-						isDiscard = length(abs(uv) - fixed2(r, r)) > _Radius;
+						isDiscard = shouldDiscard;
 					}
 					if(_RightBottom == 1 && uv.x > 0 && uv.y < 0)
 					{
-						isDiscard = length(abs(uv) - fixed2(r, r)) > _Radius;
+						isDiscard = shouldDiscard;
 					}
 				}
 				if(isDiscard == false)
