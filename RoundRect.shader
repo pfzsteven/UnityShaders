@@ -5,6 +5,7 @@ Shader "UI/RoundRect"
         _MainTex ("Texture", 2D) = "white" {}
         _Radius("Radius", Range(0,0.5)) = 0.1
         _Color("Color", Color) = (1,1,1,1)
+        _StencilRef("Stencil Ref", Range(0,255)) = 0
         [Toggle(ColorAdditive)] _ColorAdditive("Color Additive",Int) = 1
         [Toggle(All)]_All("All Round", Int) = 1
         [Toggle(LeftTop)]_LeftTop("Left Top", Int) = 0
@@ -18,18 +19,18 @@ Shader "UI/RoundRect"
         {
             "RenderType"="Opaque" "Queue"="Transparent"
         }
-        // fixme:When i add an image (contains this shader material) in the scroll view content,
-        // it will be not cut off by the mask of scroll view.
-        Stencil
-        {
-            Ref 1
-            Comp Equal
-            Pass Replace
-        }
         LOD 100
 
         Pass
         {
+            // fixme:When i add an image (contains this shader material) in the scroll view content,
+            // it will be not cut off by the mask of scroll view.
+            Stencil
+            {
+                Ref [_StencilRef] // 0-255
+                Comp Equal
+                Pass Replace
+            }
             ZWrite On
             Cull Off
             Lighting Off
