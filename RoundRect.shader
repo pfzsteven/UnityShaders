@@ -18,6 +18,14 @@ Shader "UI/RoundRect"
         {
             "RenderType"="Opaque" "Queue"="Transparent"
         }
+        // fixme:When i add an image (contains this shader material) in the scroll view content,
+        // it will be not cut off by the mask of scroll view.
+        Stencil
+        {
+            Ref 1
+            Comp Equal
+            Pass Replace
+        }
         LOD 100
 
         Pass
@@ -26,7 +34,7 @@ Shader "UI/RoundRect"
             Cull Off
             Lighting Off
             Blend SrcAlpha OneMinusSrcAlpha
-            
+
             CGPROGRAM
             // Upgrade NOTE: excluded shader from DX11; has structs without semantics (struct v2f members texRatio)
             #pragma exclude_renderers d3d11
